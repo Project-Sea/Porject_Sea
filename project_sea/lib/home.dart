@@ -11,6 +11,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String read = '''
+  query {
+    bestBoard(minDate: '2020-11-01', maxDate: '2020-11-18', size: 5)
+  }
+  ''';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,11 +31,11 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Query(
         options: QueryOptions(
-          documentNode: gql('''
-            query {
-              bestBoard(minDate: "2020-11-01", maxDate: "2020-11-30", size: 5)
-            }
-          '''),
+          documentNode: gql(read),
+          variables: {
+            'nData': 5,
+          },
+          pollInterval: 10,
         ),
         builder: (QueryResult queryResult,
             {VoidCallback refetch, FetchMore fetchMore}) {
@@ -46,34 +51,34 @@ class _HomePageState extends State<HomePage> {
           );
         },
       ),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   onTap: (index) {
-      //     if (index == 0) {
-      //       Navigator.push(
-      //         context,
-      //         MaterialPageRoute(
-      //             builder: (context) => HomePage(client: widget.client)),
-      //       );
-      //     } else {
-      //       Navigator.push(
-      //         context,
-      //         MaterialPageRoute(
-      //             builder: (context) => AccountPage(client: widget.client)),
-      //       );
-      //     }
-      //   },
-      //   items: <BottomNavigationBarItem>[
-      //     BottomNavigationBarItem(
-      //       label: '홈',
-      //       icon: Icon(Icons.home),
-      //     ),
-      //     BottomNavigationBarItem(
-      //       label: '계정',
-      //       icon: Icon(Icons.account_box),
-      //     ),
-      //   ],
-      //   selectedItemColor: Color(0xFF3C63D9),
-      // ),
+      bottomNavigationBar: BottomNavigationBar(
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => HomePage(client: widget.client)),
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => AccountPage(client: widget.client)),
+            );
+          }
+        },
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            label: '홈',
+            icon: Icon(Icons.home),
+          ),
+          BottomNavigationBarItem(
+            label: '계정',
+            icon: Icon(Icons.account_box),
+          ),
+        ],
+        selectedItemColor: Color(0xFF3C63D9),
+      ),
     );
   }
 
