@@ -13,6 +13,13 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  String signIn = '''
+  mutation(\$username: String!, \$password: String!){
+    signIn(username: \$username, password: \$password, scopes: ["board_read", "board_write", "notification_read", "project_read", "project_write", "team_read"]) {
+      access_token,
+      scope
+    }
+  }''';
 
   @override
   Widget build(BuildContext context) {
@@ -27,14 +34,7 @@ class _SignInPageState extends State<SignInPage> {
         ),
         body: Mutation(
           options: MutationOptions(
-            documentNode: gql('''
-              mutation(\$username: String!, \$password: String!){
-                signIn(username: \$username, password: \$password, scopes: ["board_read", "board_write", "notification_read", "project_read", "project_write", "team_read"]) {
-                  access_token,
-                  scope
-                }
-              }
-          '''),
+            documentNode: gql(signIn),
           ),
           builder: (
             RunMutation runMutation,

@@ -35,40 +35,90 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: Query(
-        options: QueryOptions(
-          documentNode: gql('''
+        options: QueryOptions(documentNode: gql("""
             query {
               myProfile {
-                nickname,
-                permission,
                 username,
-                createdTime,
+                nickname
               }
             }
-            '''),
-        ),
+          """)),
         builder: (QueryResult result,
             {VoidCallback refetch, FetchMore fetchMore}) {
-          if (result.hasException) {
-            return Text(result.exception.toString());
+          if (result.exception != null) {
+            return Center(
+                child: Text("에러가 발생했습니다.\n${result.exception.toString()}"));
           }
-          print(result.exception.toString());
-
           if (result.loading) {
-            return Text('Loading');
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            print(result.data.toString());
+            return Text(result.data);
           }
-          return ListView(
-            children: <Widget>[
-              _boards(),
-              SizedBox(
-                height: 20,
-              ),
-              _best(),
-              Text(result.data),
-            ],
-          );
         },
       ),
+      // body: Query(
+      //   options: QueryOptions(documentNode: gql("""
+      //       query {
+      //         myProfile {
+      //           username,
+      //           nickname
+      //         }
+      //   }
+      // """)),
+      //   builder: (QueryResult result,
+      //       {VoidCallback refetch, FetchMore fetchMore}) {
+      //     if (result.exception != null) {
+      //       return Center(
+      //           child: Text("에러가 발생했습니다.\n${result.exception.toString()}"));
+      //     }
+      //     if (result.loading) {
+      //       return Center(
+      //         child: CircularProgressIndicator(),
+      //       );
+      //     } else {
+      //       print(result.data.toString());
+      //       return Text(result.data);
+      //     }
+      //   },
+      // ),
+      // body: Query(
+      //   options: QueryOptions(
+      //     documentNode: gql('''
+      //       query {
+      //         myProfile {
+      //           nickname,
+      //           permission,
+      //           username,
+      //           createdTime,
+      //         }
+      //       }
+      //       '''),
+      //   ),
+      //   builder: (QueryResult result,
+      //       {VoidCallback refetch, FetchMore fetchMore}) {
+      //     if (result.hasException) {
+      //       return Text(result.exception.toString());
+      //     }
+      //     print(result.exception.toString());
+
+      //     if (result.loading) {
+      //       return Text('Loading');
+      //     }
+      //     return ListView(
+      //       children: <Widget>[
+      //         _boards(),
+      //         SizedBox(
+      //           height: 20,
+      //         ),
+      //         _best(),
+      //         Text(result.data),
+      //       ],
+      //     );
+      //   },
+      // ),
       bottomNavigationBar: BottomNavigationBar(
         onTap: (index) {
           if (index == 0) {
