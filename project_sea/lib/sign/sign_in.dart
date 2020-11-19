@@ -19,6 +19,7 @@ class _SignInPageState extends State<SignInPage> {
     return GraphQLProvider(
       client: widget.client,
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           centerTitle: true,
           elevation: 0.0,
