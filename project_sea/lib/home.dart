@@ -13,7 +13,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String read = '''
   query {
-    bestBoard(minDate: '2020-11-01', maxDate: '2020-11-18', size: 5)
+    bestBoard(minDate: '2020-11-01', maxDate: '2020-11-18', size: 5) {
+      content
+      writer
+    }
   }
   ''';
   @override
@@ -37,8 +40,16 @@ class _HomePageState extends State<HomePage> {
           },
           pollInterval: 10,
         ),
-        builder: (QueryResult queryResult,
+        builder: (QueryResult result,
             {VoidCallback refetch, FetchMore fetchMore}) {
+          if (result.hasException) {
+            return Text(result.exception.toString());
+          }
+          print(result.exception.toString());
+
+          if (result.loading) {
+            return Text('Loading');
+          }
           return ListView(
             children: <Widget>[
               _boards(),
@@ -46,7 +57,7 @@ class _HomePageState extends State<HomePage> {
                 height: 20,
               ),
               _best(),
-              Text(queryResult.data),
+              Text(result.data),
             ],
           );
         },
