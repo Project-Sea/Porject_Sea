@@ -13,9 +13,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String read = '''
   query {
-    bestBoard(minDate: '2020-11-01', maxDate: '2020-11-18', size: 5) {
-      content
-      writer
+    myProfile {
+      nickname,
+      permission,
+      username,
+      createdTime,
     }
   }
   ''';
@@ -34,11 +36,16 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Query(
         options: QueryOptions(
-          documentNode: gql(read),
-          variables: {
-            'nData': 5,
-          },
-          pollInterval: 10,
+          documentNode: gql('''
+            query {
+              myProfile {
+                nickname,
+                permission,
+                username,
+                createdTime,
+              }
+            }
+            '''),
         ),
         builder: (QueryResult result,
             {VoidCallback refetch, FetchMore fetchMore}) {

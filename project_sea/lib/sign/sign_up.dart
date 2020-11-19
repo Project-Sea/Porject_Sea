@@ -56,18 +56,24 @@ class _SignUpPageState extends State<SignUpPage> {
                   TextField(
                     decoration: InputDecoration(
                       hintText: 'Nickname',
+                      filled: true,
+                      fillColor: Color(0x2F3C63D9),
                     ),
                     controller: nicknameController,
                   ),
                   TextField(
                     decoration: InputDecoration(
                       hintText: 'University e-mail (~@ptu.ac.kr)',
+                      filled: true,
+                      fillColor: Color(0x2F3C63D9),
                     ),
                     controller: usernameController,
                   ),
                   TextField(
                     decoration: InputDecoration(
                       hintText: 'Password',
+                      filled: true,
+                      fillColor: Color(0x2F3C63D9),
                     ),
                     controller: passwordController,
                   ),
