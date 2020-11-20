@@ -23,95 +23,91 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
-    return GraphQLProvider(
-      client: widget.client,
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          centerTitle: true,
-          elevation: 0.0,
-          title: Text('Welcome'),
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        centerTitle: true,
+        elevation: 0.0,
+        title: Text('Welcome'),
+      ),
+      body: Mutation(
+        options: MutationOptions(
+          documentNode: gql(signIn),
         ),
-        body: Mutation(
-          options: MutationOptions(
-            documentNode: gql(signIn),
-          ),
-          builder: (
-            RunMutation runMutation,
-            QueryResult queryResult,
-          ) {
-            return Container(
-              padding: const EdgeInsets.all(30.0),
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    margin: const EdgeInsets.all(20.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(30.0),
-                      ),
+        builder: (
+          RunMutation runMutation,
+          QueryResult queryResult,
+        ) {
+          return Container(
+            padding: const EdgeInsets.all(30.0),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  margin: const EdgeInsets.all(20.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(30.0),
                     ),
-                    height: 200,
-                    alignment: Alignment.center,
-                    // child: Image.asset(
-                    //   'img/Logo.png',
-                    //   fit: BoxFit.fill,
-                    // ),
                   ),
-                  TextField(
-                    decoration: InputDecoration(
-                      hintText: 'University e-mail (~@ptu.ac.kr)',
-                      filled: true,
-                      fillColor: Color(0x2F3C63D9),
-                    ),
-                    controller: usernameController,
+                  height: 200,
+                  alignment: Alignment.center,
+                  // child: Image.asset(
+                  //   'img/Logo.png',
+                  //   fit: BoxFit.fill,
+                  // ),
+                ),
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: 'University e-mail (~@ptu.ac.kr)',
+                    filled: true,
+                    fillColor: Color(0x2F3C63D9),
                   ),
-                  TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Password',
-                      filled: true,
-                      fillColor: Color(0x2F3C63D9),
-                    ),
-                    controller: passwordController,
+                  controller: usernameController,
+                ),
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Password',
+                    filled: true,
+                    fillColor: Color(0x2F3C63D9),
                   ),
-                  RaisedButton(
-                    child: Text('Sign In'),
-                    onPressed: () {
-                      runMutation(
-                        {
-                          'username': usernameController.text,
-                          'password': passwordController.text,
-                        },
-                      );
-                      if (queryResult.exception == null) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                HomePage(client: widget.client),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                  RaisedButton(
-                    child: Text('Sign Up'),
-                    onPressed: () {
+                  controller: passwordController,
+                ),
+                RaisedButton(
+                  child: Text('Sign In'),
+                  onPressed: () {
+                    runMutation(
+                      {
+                        'username': usernameController.text,
+                        'password': passwordController.text,
+                      },
+                    );
+                    if (queryResult.exception == null) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                SignUpPage(client: widget.client)),
+                          builder: (context) => HomePage(client: widget.client),
+                        ),
                       );
-                    },
-                  ),
-                  Text("Error : ${queryResult.exception.toString()}"),
-                  Text("Result : ${queryResult.data}"),
-                ],
-              ),
-            );
-          },
-        ),
+                    }
+                  },
+                ),
+                RaisedButton(
+                  child: Text('Sign Up'),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              SignUpPage(client: widget.client)),
+                    );
+                  },
+                ),
+                Text("Error : ${queryResult.exception.toString()}"),
+                Text("Result : ${queryResult.data}"),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
