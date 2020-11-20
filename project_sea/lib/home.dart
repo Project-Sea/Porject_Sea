@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -13,13 +14,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String read = '''
-  query {
-    myProfile {
-      nickname,
-      permission,
-      username,
-      createdTime,
+  String bestBaord = '''
+  query bestboard(\$minDate: String!, \$maxDate: String!, \$size: Int!) {
+    bestBoard(minDate: \$minDate, maxDate: \$maxDate, size: \$size) {
+      category
+      recommendCount
+      content
+      subject
+      writer
+      readCount
     }
   }
   ''';
@@ -103,7 +106,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
-    var boards = Container(
+    var boardsButton = Container(
       alignment: Alignment.center,
       child: Container(
         alignment: Alignment.center,
@@ -122,141 +125,154 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
-    return GraphQLProvider(
-      client: widget.client,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Home'),
-          centerTitle: true,
-          // actions: <Widget>[
-          //   IconButton(
-          //     icon: Icon(Icons.message),
-          //     onPressed: () {},
-          //   ),
-          // ],
-        ),
-        body: ListView(
-          children: [
-            boards,
-          ],
-        ),
-        // body: Query(
-        //   options: QueryOptions(documentNode: gql("""
-        //       query {
-        //         myProfile {
-        //           username,
-        //           nickname
-        //         }
-        //       }
-        //     """)),
-        //   builder: (QueryResult result,
-        //       {VoidCallback refetch, FetchMore fetchMore}) {
-        //     if (result.exception != null) {
-        //       return Center(
-        //           child: Text("에러가 발생했습니다.\n${result.exception.toString()}"));
-        //     }
-        //     if (result.loading) {
-        //       return Center(
-        //         child: CircularProgressIndicator(),
-        //       );
-        //     } else {
-        //       //print(result.exception.toString());
-        //       var user = json.decode(result.data.toString());
-        //       print(user['myProfile']);
-
-        //       return Text(result.data);
-        //     }
-        //   },
-        // ),
-        // body: Query(
-        //   options: QueryOptions(documentNode: gql("""
-        //       query {
-        //         myProfile {
-        //           username,
-        //           nickname
-        //         }
-        //   }
-        // """)),
-        //   builder: (QueryResult result,
-        //       {VoidCallback refetch, FetchMore fetchMore}) {
-        //     if (result.exception != null) {
-        //       return Center(
-        //           child: Text("에러가 발생했습니다.\n${result.exception.toString()}"));
-        //     }
-        //     if (result.loading) {
-        //       return Center(
-        //         child: CircularProgressIndicator(),
-        //       );
-        //     } else {
-        //       print(result.data.toString());
-        //       return Text(result.data);
-        //     }
-        //   },
-        // ),
-        // body: Query(
-        //   options: QueryOptions(
-        //     documentNode: gql('''
-        //       query {
-        //         myProfile {
-        //           nickname,
-        //           permission,
-        //           username,
-        //           createdTime,
-        //         }
-        //       }
-        //       '''),
-        //   ),
-        //   builder: (QueryResult result,
-        //       {VoidCallback refetch, FetchMore fetchMore}) {
-        //     if (result.hasException) {
-        //       return Text(result.exception.toString());
-        //     }
-        //     print(result.exception.toString());
-
-        //     if (result.loading) {
-        //       return Text('Loading');
-        //     }
-        //     return ListView(
-        //       children: <Widget>[
-        //         _boards(),
-        //         SizedBox(
-        //           height: 20,
-        //         ),
-        //         _best(),
-        //         Text(result.data),
-        //       ],
-        //     );
-        //   },
-        // ),
-        bottomNavigationBar: BottomNavigationBar(
-          onTap: (index) {
-            if (index == 0) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Home'),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.note_add),
+            onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => HomePage(client: widget.client)),
+                  builder: (context) => WritePage(client: widget.client),
+                ),
               );
-            } else {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => AccountPage(client: widget.client)),
-              );
-            }
-          },
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              label: '홈',
-              icon: Icon(Icons.home),
-            ),
-            BottomNavigationBarItem(
-              label: '계정',
-              icon: Icon(Icons.account_box),
-            ),
-          ],
-          selectedItemColor: Color(0xFF3C63D9),
-        ),
+            },
+          ),
+        ],
+      ),
+      body: Query(
+        options: QueryOptions(documentNode: gql(bestBaord), variables: {
+          'minDate': '2020-11-01',
+          'maxDate': '2020-11-20',
+          'size': 10,
+        }),
+        builder: (QueryResult result,
+            {VoidCallback refetch, FetchMore fetchMore}) {
+          if (result.hasException) {
+            return Text(result.exception.toString());
+          }
+          if (result.loading) {
+            return Text('loading');
+          }
+
+          List bestBoard = result.data['bestBoard'];
+          Map read = bestBoard[0];
+
+          var boards = [];
+          for (var i = 0; i < bestBoard.length; i++) {
+            boards.add(
+              ListEntry(
+                read['categories'].toString(),
+                read['recommedCount'].toString(),
+                read['title'].toString(),
+                read['content'].toString(),
+                read['writer'].toString(),
+                read['view'].toString(),
+              ),
+            );
+          }
+
+          return Column(
+            children: [
+              boardsButton,
+              Container(
+                padding: const EdgeInsets.all(3.0),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 3.0),
+                decoration: new BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: new BorderRadius.all(new Radius.circular(15.0)),
+                ),
+                child: ListTile(
+                  title: Text(boards[0].title),
+                  subtitle: Text(boards[0].writer),
+                  leading: Icon(
+                    Icons.dashboard,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => HomePage(client: widget.client)),
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => AccountPage(client: widget.client)),
+            );
+          }
+        },
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            label: '홈',
+            icon: Icon(Icons.home),
+          ),
+          BottomNavigationBarItem(
+            label: '알림',
+            icon: Icon(Icons.message),
+          ),
+          BottomNavigationBarItem(
+            label: '계정',
+            icon: Icon(Icons.account_box),
+          ),
+        ],
+        selectedItemColor: Color(0xFF3C63D9),
       ),
     );
   }
+}
+
+class Board extends StatelessWidget {
+  const Board(this.board);
+
+  final ListEntry board;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(3.0),
+      margin: const EdgeInsets.symmetric(
+        horizontal: 10.0,
+        vertical: 3.0,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: new BorderRadius.all(
+          Radius.circular(15.0),
+        ),
+      ),
+      child: ListTile(
+        title: Text(board.title),
+        subtitle: Text(board.writer),
+        trailing: new Row(
+          verticalDirection: VerticalDirection.up,
+        ),
+        onTap: () {
+          // Navigator.pushNamed(context, '/forum/1');
+        },
+      ),
+    );
+  }
+}
+
+class ListEntry {
+  final String category;
+  final String recommedCount;
+  final String title;
+  final String content;
+  final String writer;
+  final String view;
+  ListEntry(this.category, this.recommedCount, this.title, this.content,
+      this.writer, this.view);
 }

@@ -6,3 +6,4 @@ export 'boards/department.dart';
 export 'boards/general.dart';
 export 'boards/notification.dart';
 export 'boards/project.dart';
+export 'write.dart';
